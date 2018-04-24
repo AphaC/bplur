@@ -1,0 +1,96 @@
+<style lang="less">
+  .counter {
+    text-align: left;
+    font-size: 12px;
+  }
+  .count {
+    font-size: 12px;
+    padding-right: 18rpx;
+    /*font-weight: bold;*/
+    &.red {
+      color: red;
+    }
+    &.green {
+      color: green;
+    }
+  }
+</style>
+<template>
+  <view class="counter {{style}}">
+    <button @tap="plus" size="mini">  +  </button>
+    <button @tap="minus" size="mini">  -  </button>
+  </view>
+  <view>
+    <button @tap="incNum" size="mini">  INC  </button>
+    <button @tap="decNum" size="mini">  DEC  </button>
+  </view>
+  <view>
+    <button @tap="asyncInc" size="mini">  ASYNC INC  </button>
+    <button @tap="asyncDec" size="mini">  ASYNC DEC  </button>
+  </view>
+  <view>
+    <text class="count.red">propNum: {{num}} </text>
+    <text class="count.green">stateNum: {{stateNum}} </text>
+    <text class="count.green">asyncNum: {{asyncNum}} </text>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import { connect } from 'wepy-redux'
+  import { INCREMENT, DECREMENT } from '../store/types/counter'
+  import { asyncInc, asyncDec } from '../store/actions'
+
+  @connect({
+    stateNum (state) {
+      return state.counter.num
+    },
+    asyncNum (state) {
+      return state.counter.asyncNum
+    }
+  }, {
+    incNum: INCREMENT,
+    decNum: DECREMENT,
+    asyncInc,
+    asyncDec
+  })
+
+  export default class Counter extends wepy.component {
+    props = {
+      num: {
+        type: [Number, String],
+        coerce: function (v) {
+          return +v
+        },
+        default: 50
+      }
+    }
+
+    data = {
+    }
+    events = {
+      'index-broadcast': (...args) => {
+        let $event = args[args.length - 1]
+        console.log(`components/counter.wpy -->: ${this.$name} receive ${$event.name} from ${$event.source.$name}`)
+      }
+    }
+
+    watch = {
+      num (curVal, oldVal) {
+        console.log(`旧值：${oldVal}，新值：${curVal}`)
+      }
+    }
+
+    methods = {
+      plus () {
+        this.num = this.num + 1
+        console.log(this.$name + ' plus tap; +++++ plus method in components/counter.wpy')
+
+        this.$emit('index-emit', 1, 2, 3)
+      },
+      minus () {
+        this.num = this.num - 1
+        console.log(this.$name + ' minus tap; ----- minus method in components/counter.wpy')
+      }
+    }
+  }
+</script>

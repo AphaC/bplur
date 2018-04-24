@@ -1,0 +1,120 @@
+<style lang="less">
+  .userinfo {
+    margin-top: 32rpx;
+    padding-top: 32rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    background-color: #ffffff;
+  }
+
+  .userinfo-avatar {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+  }
+
+  .userinfo-nickname {
+    color: #aaa;
+  }
+
+</style>
+<template>
+  <view class="container">
+    <view class="userinfo" @tap="handleViewTap">
+      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+      <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
+    </view>
+    <view>
+      asdf
+    </view>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+    <panel>
+      <view class="title" slot="title">Test List</view>
+    </panel>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import panel from '@/components/panel'
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '我',
+      backgroundColor: '#efeff4'
+    };
+    components = {
+      panel: panel
+    };
+    data = {
+      userInfo: {
+        nickName: '加载中...'
+      },
+      imgUrls: [
+        'http://img02.tooopen.com/images/20150928/tooopen_sy_143912755726.jpg',
+        'http://img06.tooopen.com/images/20160818/tooopen_sy_175866434296.jpg',
+        'http://img06.tooopen.com/images/20160818/tooopen_sy_175833047715.jpg'
+      ]
+    };
+
+    methods = {};
+    onLoad() {
+      let self = this
+      console.log('yes.........>1')
+      this.$parent.getUserInfo(function (userInfo) {
+        console.log('-----------2')
+        console.log(userInfo)
+        if (userInfo) {
+          self.userInfo = userInfo
+        }
+        self.$apply()
+      })
+      console.log('yes.........>3')
+    }
+  }
+</script>

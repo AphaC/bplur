@@ -1,0 +1,63 @@
+<style lang="less">
+    .mylist:odd {
+        color: red;
+    }
+    .mylist:even {
+        color: green;
+    }
+    .mylistx {
+      &.red {
+        color: red;
+      }
+    }
+</style>
+<template>
+    <view class="wepy-list">
+        <view>
+            <button @tap="add" size="mini">添加列表(wepy-list)</button>
+        </view>
+        <block wx:for-items="{{list}}" wx:for-index="index" wx:for-item="item" wx:key="id">
+            <view @tap="tap">
+                <text class="mylistx.red">{{item.id}}</text>: {{item.title}}
+            </view>
+        </block>
+    </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class ListAnother extends wepy.component {
+    data = {
+      list: [
+        {
+          id: '0',
+          title: 'loading'
+        }
+      ]
+    }
+
+    events = {
+      'index-broadcast': (...args) => {
+        let $event = args[args.length - 1]
+        console.log('value of args: ')
+        console.log(args)
+        console.log(`components/wepy-list.py --> ${this.$name} receive ${$event.name} from ${$event.source.name}`)
+      }
+    }
+
+    methods = {
+      tap () {
+        // this.num = this.num + 1
+        console.log(this.$name + ' tap')
+      },
+      add () {
+        let len = this.list.length
+        console.log('wepy list', len)
+        this.list.push({id: len, title: 'title_' + len})
+      }
+    }
+
+    onLoad () {
+    }
+  }
+</script>

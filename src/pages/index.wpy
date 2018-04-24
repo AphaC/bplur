@@ -1,0 +1,209 @@
+<style lang="less">
+  .slide-image{
+    width: 100%;
+    height: 100%;
+    background-color: bisque;
+  }
+  .swiper {
+    /*margin-top: 32rpx;*/
+    height: 348rpx;
+    /*width: 750rpx;*/
+    /*position: relative;*/
+    width: 100%;
+  }
+  .wrap {
+    display: block;
+    /*min-height: 300rpx;*/
+    /*max-height: 620rpx;*/
+    /*background: #f7f7f7;*/
+    padding-top: 30rpx;
+    padding-left: 15rpx;
+    padding-right: 15rpx;
+  }
+  .item {
+    /*font-size: 20rpx;*/
+    /*line-height: 300rpx;*/
+    /*min-height: 300rpx;*/
+    /*padding: 20 rpx 15 rpx 30 rpx;*/
+    /*max-height: 420rpx;*/
+    /*text-align: center;*/
+    padding: 12rpx;
+  }
+  .djimg {
+    display:block;
+    /*width: 240rpx;*/
+    /*height: auto;*/
+    max-width: 100%;
+    /*max-height: 100%;*/
+    /*width: auto;*/
+    /*height: auto;*/
+  }
+  .side {
+    width: 200rpx;
+    /*background: #afdde3;*/
+    flex-grow: 0;
+  }
+  .main {
+    /*background: #f397b2;*/
+    flex-grow: 1;
+  }
+  .eventname {
+    font-size:36rpx;
+  }
+</style>
+<template>
+  <view class="container">
+    <swiper class="swiper" indicator-active-color="{{indicatorActiveColor}}" indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" circular="true">
+      <block wx:for="{{adList}}" wx:key="key">
+        <swiper-item>
+          <!--<image src="{{item.imgUrl}}" class="slide-image" @tap="goToAdvert({{item.adUrl}})" />-->
+          <image src="{{item.imgUrl}}" class="slide-image" />
+        </swiper-item>
+      </block>
+    </swiper>
+    <!--<view class="shop_list">-->
+      <!--矩阵商品列表模块-->
+      <!--<ticketInfiniteScrolling :list.sync="ticketList"></ticketInfiniteScrolling>-->
+      <!--加载更多时动画-->
+      <!--<bottomLoadMore :show.sync="showLoading" message="正在加载"></bottomLoadMore>-->
+      <!--暂无数据显示-->
+      <!--<placeholder :show.sync="is_empty" message="暂无发现数据"></placeholder>-->
+    <!--</view>-->
+    <scroll-view scroll-y="true">
+      <view>
+        <navigator wx:for="{{ticketList}}" wx:key="item" url="/pages/goods_detail?id={{item.id}}&purchasetype={{purchasetype}}&special={{special}}">
+          <wxc-flex class="wrap">
+            <view class="item side">
+              <image src="{{item.imageLeft}}" class="djimg" ></image>
+            </view>
+            <view class="item main">
+              <view class="eventname">{{item.eventName}}</view>
+              <view class="eventname">{{item.startAt}}</view>
+              <view class="eventname">{{item.priceLeft}}</view>
+              <view class="eventname">{{item.priceRight}}</view>
+              <view class="eventname">{{item.ticketStatus}}</view>
+            </view>
+          </wxc-flex>
+        </navigator>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { connect } from 'wepy-redux'
+  import ticketInfiniteScrolling from '@/components/ticketInfiniteScrolling'
+  import moduleA from 'module-a' // aliasFields ignore module example
+  import apis from '../apis/apis'
+
+  console.log('moduleA ignored: ', moduleA) // => moduleA ignored: {}
+
+  @connect({
+    num (state) {
+      return state.counter.num
+    },
+    asyncNum (state) {
+      return state.counter.asyncNum
+    },
+    sumNum (state) {
+      return state.counter.num + state.counter.asyncNum
+    }
+  })
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '蹦迪迪',
+      enablePullDownRefresh: true,
+      // backgroundColor: '#69C3AA'
+      usingComponents: {
+        'wxc-toast': '../../packages/@minui/wxc-toast/dist/index',
+        'wxc-flex': '../../packages/@minui/wxc-flex/dist/index'
+      }
+    }
+    refreshing = false
+    components = {
+      ticketInfiniteScrolling: ticketInfiniteScrolling
+    }
+    data = {
+      userInfo: {
+        nickName: '加载中...'
+      },
+      adList: [],
+      ticketList: [],
+      indicatorDots: true,
+      autoplay: true,
+      interval: 3000,
+      duration: 1000,
+      indicatorActiveColor: '#ff7786'
+    }
+
+    computed = {
+    }
+
+    methods = {
+    }
+
+    events = {
+    }
+
+    async getAdList() {
+      const json = await apis.getAdList({
+        query: {}
+      })
+      console.log(json)
+      if (json.data.code === 1) {
+        // console.log('==========')
+        this.adList = json.data.list
+        console.log('>> adList: ', this.adList)
+        this.$apply()
+      } else {}
+      // console.log('')
+      // console.log('ad list: ----------------------- start')
+      // console.log(json)
+      // console.log('ad list: ----------------------- end')
+      // console.log('')
+      // if (json.data.code === 1) {
+      //   this.adList = json.data.list;
+      //   this.$apply();
+      // } else {}
+    }
+
+    async getMostRecentTicketList() {
+      const json = await apis.getMostRecentTicketList({
+        query: {}
+      })
+      // console.log('yes, here we go>>-------------------->')
+      // console.log(json)
+      if (json.data.code === 1) {
+        this.ticketList = json.data.list
+        console.log('>> ticketList: ', this.ticketList)
+        this.$apply()
+      } else {}
+    }
+
+    onLoad() {
+      let self = this
+      this.$parent.getUserInfo(function (userInfo) {
+        // console.log('-----------2')
+        // console.log(userInfo)
+        if (userInfo) {
+          self.userInfo = userInfo
+        }
+        self.$apply()
+      })
+      this.getAdList()
+      this.getMostRecentTicketList()
+    }
+
+    onPullDownRefresh() {
+      if (this.refreshing) return false
+      this.refreshing = true
+      setTimeout(() => {
+        console.log('1 elapsed....><')
+        this.refreshing = false
+        wepy.stopPullDownRefresh()
+      }, 1000)
+    }
+  }
+</script>

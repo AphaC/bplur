@@ -1,0 +1,193 @@
+<style lang="less">
+/*page {*/
+  /*height: 100%;*/
+  /*background-color: #efeff4;*/
+//}
+.container {
+  height: 100%;
+  /*width: 100%;*/
+  /*display: flex;*/
+  /*flex-direction: column;*/
+  /*align-items: center;*/
+  /*justify-content: space-between;*/
+  /*box-sizing: border-box;*/
+  background-color: #efeff4;
+  /*background-color: #69C3AA;*/
+}
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+import Promise from 'promise-polyfill'
+
+import { setStore } from 'wepy-redux'
+import configStore from './store'
+import {
+  USER_SPECICAL_INFO,
+  USER_INFO,
+  SYSTEM_INFO
+  // ACCESS_TOKEN
+  // ADDRESS_ID,
+  // SEL_CLASS_CODE
+} from './utils/constant'
+
+const store = configStore()
+setStore(store)
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/index',
+      'pages/my'
+    ],
+    window: {
+      // backgroundColor: '#efeff4',
+      backgroundColor: '#efeff4',  // this is the color of the places out of template.
+      backgroundTextStyle: 'dark',
+      // navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: 'BPlur',
+      navigationBarTextStyle: 'white',
+      // navigationBarBackgroundColor: '#69C3AA'
+      navigationBarBackgroundColor: '#212121'
+    },
+    // 'tabBar': {
+    //   'color': '#999999',
+    //   'selectedColor': '#ff6a3c',
+    //   'backgroundColor': '#ffffff',
+    //   'borderStyle': 'black',
+    //   'list': [{
+    //     'pagePath': 'pages/index',
+    //     'text': '首页',
+    //     'iconPath': 'images/icon_home.png',
+    //     'selectedIconPath': 'images/icon_home_active.png'
+    //   }, {
+    //     'pagePath': 'pages/my',
+    //     'text': '我',
+    //     'iconPath': 'images/icon_info.png',
+    //     'selectedIconPath': 'images/icon_info_active.png'
+    //   }]
+    // }
+    'tabBar': {
+      'color': '#999999', // tab 上的文字默认颜色
+      'selectedColor': '#ff6a3c',  // tab 上的文字选中时的颜色
+      'backgroundColor': '#ffffff', // tab 的背景色
+      'borderStyle': 'black', // tabbar上边框的颜色， 仅支持 black/white
+      // 'borderStyle': 'white',
+      'position': 'bottom',
+      'list': [{
+        'pagePath': 'pages/index',
+        'iconPath': 'images/icon_home.png',
+        'selectedIconPath': 'images/icon_home_active.png',
+        'text': '首页'
+      }, {
+        'pagePath': 'pages/my',
+        'iconPath': 'images/icon_info.png',
+        'selectedIconPath': 'images/icon_info_active.png',
+        'text': '我'
+      }]
+    }
+  }
+
+  globalData = {
+    userInfo: null,
+    appid: 'wx14df6b0c1246e370',
+    secret: '11aa8f1c50c6c0289354f2332e8efa0e'
+  }
+
+  constructor () {
+    super()
+    // wepy当前内置两个中间件：
+    // requestfix: 修复小程序请求并发问题。
+    // promisify：使用wepy.xxx的方式请求小程序原生API都将Promise化。
+    // https://github.com/Tencent/wepy/issues/954
+    // Usage:
+    this.use('requestfix')
+    this.use('promisify')
+  }
+
+  sleep (s) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('promise resolved')
+      }, s * 1000)
+    })
+  }
+
+  async testAsync () {
+    // console.log('>--> start to sleep 3 s in testAsync:')
+    const data = await this.sleep(3)
+    console.log(data)
+    // console.log('> 3s sleeping finished.')
+    // console.log('')
+  }
+
+  async onLaunch() {
+    let that = this
+    let wxSessionStatus = await wepy.checkSession()
+      .then(
+        res => { console.log('>>> wx session still valid 😘: ', res, Date.now()); return true },
+        res => { console.log('>>> wx session expired  😡: ', res, Date.now()); return false })
+      .then(
+        console.log('Session checking has completed. Timestamp: ', Date.now())
+      )
+    if (!wxSessionStatus) {
+      console.log('🎱wepy.login() start')
+      let res = await wepy.login()
+      console.log('🎱wepy.login(). end')
+      // const resUI = await wepy.getUserInfo()
+      // wepy.setStorageSync(USER_INFO, resUI.userInfo)
+      // that.globalData.userInfo = resUI.userInfo
+      // console.log('end of calling wepy.login(). ------------------3')
+      // todo: post ``res.code`` to backend!
+      // todo: later post ``responseOfGetUserInfo`` to backend! we cannot post both at the same time.
+      if (res.code) {
+        let d = that.globalData // 这里存储了appid、secret、token串
+        let url = 'https://api.weixin.qq.com/sns/jscode2session?appid=' + d.appid + '&secret=' + d.secret + '&js_code=' + res.code + '&grant_type=authorization_code'
+
+        let b = await wepy.request({
+          url: url,
+          data: {},
+          method: 'POST',
+          header: {
+            'content-Type': 'application/x-www-form-urlencoded'
+          }
+        })
+        console.log('😋 response (posting appid & secret & code) : ----------------------->')
+        console.log(b)
+        if (b.data.openid) {
+          let obj = {}
+          obj.openid = b.data.openid
+          obj.expires_in = Date.now() + b.data.expires_in
+          // 存储openid
+          wepy.setStorageSync(USER_SPECICAL_INFO, obj)
+          // 存储系统信息
+          let systemInfo = await wepy.getSystemInfoSync()
+          wepy.setStorageSync(SYSTEM_INFO, systemInfo)
+          // console.log(b, '登陆成功')
+        }
+      }
+    }
+  }
+
+  async getUserInfo(cb) {
+    let that = this
+    if (that.globalData.userInfo) {
+      // ----------------------------------------
+      // add to commit msg:
+      // fixed where the userInfo cannot be loaded
+      // in index.py page
+      // after allow MINA to get user info.
+      // ----------------------------------------
+      cb && cb(that.globalData.userInfo)
+      return that.globalData.userInfo
+    }
+    const res = await wepy.getUserInfo()
+    // TODO: handle situdation where user decline this.
+    console.log(res)
+    wepy.setStorageSync(USER_INFO, res.userInfo)
+    that.globalData.userInfo = res.userInfo
+    cb && cb(res.userInfo)
+  }
+}
+</script>
