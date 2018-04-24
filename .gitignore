@@ -2,3 +2,4 @@ node_modules/
 .idea/
 dist/
 .DB_store
+src/config/dev
