@@ -1,9 +1,10 @@
 import {
   wxRequest
 } from '../utils/wxRequest'
+import DevConfig from '../config/dev'
 
 // let env = '-test' // -dev 或者 -test
-const BASE_URL_FOR_DEV = 'http://192.168.0.35/bplur/api/v1'
+const BASE_URL_FOR_DEV = DevConfig.BASE_URL
 
 const apiMall = BASE_URL_FOR_DEV
 // const apiMall = 'https://api.tangxinmao.com'
