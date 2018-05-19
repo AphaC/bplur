@@ -2,9 +2,23 @@
 # yarn lockfile v1
 
 
+"@minui/wxc-flex@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@minui/wxc-flex/-/wxc-flex-1.0.5.tgz#0e6b22d5740fa86772a79d7c84122418cef1241d"
+
 "@minui/wxc-icon@^1.0.8":
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/@minui/wxc-icon/-/wxc-icon-1.0.8.tgz#930d4051aadf7e8efe28db51180184b5cb9d451a"
+
+"@minui/wxc-icon@^1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@minui/wxc-icon/-/wxc-icon-1.0.9.tgz#689563d326146a92c0ba547d128c7f322a340ef1"
+
+"@minui/wxc-toast@^1.0.8":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@minui/wxc-toast/-/wxc-toast-1.0.9.tgz#348ee648da74d625c51fbacbf261fc9c98d4e606"
+  dependencies:
+    "@minui/wxc-icon" "^1.0.9"
 
 abbrev@1:
   version "1.1.1"

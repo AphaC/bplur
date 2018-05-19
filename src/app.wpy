@@ -23,6 +23,8 @@ import Promise from 'promise-polyfill'
 
 import { setStore } from 'wepy-redux'
 import configStore from './store'
+import tip from './utils/tip'
+
 import {
   USER_SPECICAL_INFO,
   USER_INFO,
@@ -90,6 +92,7 @@ export default class extends wepy.app {
   }
 
   globalData = {
+    userAuthorized: true,
     userInfo: null,
     appid: 'wx14df6b0c1246e370',
     secret: '11aa8f1c50c6c0289354f2332e8efa0e'
@@ -170,7 +173,21 @@ export default class extends wepy.app {
     }
   }
 
+  async getAuthorizedSetting(cb) {
+    // 查看是否授权
+    tip.loading()
+    const setting = await wepy.getSetting()
+    const isAuthorized = true
+    if (setting.authSetting && setting.authSetting['scope.userInfo']) {
+      cb(isAuthorized)
+    } else {
+      tip.loaded()
+      cb(!isAuthorized)
+    }
+  }
+
   async getUserInfo(cb) {
+    tip.loading()
     let that = this
     if (that.globalData.userInfo) {
       // ----------------------------------------
@@ -180,6 +197,7 @@ export default class extends wepy.app {
       // after allow MINA to get user info.
       // ----------------------------------------
       cb && cb(that.globalData.userInfo)
+      tip.loaded()
       return that.globalData.userInfo
     }
     const res = await wepy.getUserInfo()
@@ -188,6 +206,7 @@ export default class extends wepy.app {
     wepy.setStorageSync(USER_INFO, res.userInfo)
     that.globalData.userInfo = res.userInfo
     cb && cb(res.userInfo)
+    tip.loaded()
   }
 }
 </script>
