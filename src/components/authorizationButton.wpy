@@ -19,7 +19,7 @@
       label: {
         default: '获取用户信息',
         type: String
-      },
+      }
     }
     methods = {
       onGotUserInfo (e) {
