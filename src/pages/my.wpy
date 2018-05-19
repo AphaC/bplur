@@ -21,66 +21,73 @@
 </style>
 <template>
   <view class="container">
-    <view class="userinfo" @tap="handleViewTap">
-      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
-      <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
+    <authorizationButton
+      wx:if="{{ !userAuthorized }}"
+      @onUserAuthorized.user="onUserAuthorized"
+    />
+    <view wx:if="{{ userAuthorized }}" class="myView">
+      <view class="userinfo" @tap="handleViewTap">
+        <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+        <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
+      </view>
+      <view>
+        asdf
+      </view>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
+      <panel>
+        <view class="title" slot="title">Test List</view>
+      </panel>
     </view>
-    <view>
-      asdf
-    </view>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
-    <panel>
-      <view class="title" slot="title">Test List</view>
-    </panel>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
+  import authorizationButton from '@/components/authorizationButton'
   import panel from '@/components/panel'
 
   export default class Index extends wepy.page {
@@ -89,9 +96,11 @@
       backgroundColor: '#efeff4'
     };
     components = {
+      authorizationButton: authorizationButton,
       panel: panel
     };
     data = {
+      userAuthorized: true,
       userInfo: {
         nickName: '加载中...'
       },
@@ -102,19 +111,35 @@
       ]
     };
 
-    methods = {};
+    methods = {
+      onUserAuthorized () {
+        let self = this
+        this.userAuthorized = true
+        this.$parent.getUserInfo(function (userInfo) {
+          if (userInfo) {
+            self.userInfo = userInfo
+            self.$apply()
+          }
+        })
+        this.$apply()
+      }
+    };
+
     onLoad() {
       let self = this
-      console.log('yes.........>1')
-      this.$parent.getUserInfo(function (userInfo) {
-        console.log('-----------2')
-        console.log(userInfo)
-        if (userInfo) {
-          self.userInfo = userInfo
+      this.$parent.getAuthorizedSetting(function(isAuthorized) {
+        if (isAuthorized) {
+          self.userAuthorized = isAuthorized
+          self.$parent.getUserInfo(function (userInfo) {
+            if (userInfo) {
+              self.userInfo = userInfo
+            }
+          })
+        } else {
+          self.userAuthorized = isAuthorized
         }
         self.$apply()
       })
-      console.log('yes.........>3')
     }
   }
 </script>

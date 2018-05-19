@@ -90,6 +90,7 @@ export default class extends wepy.app {
   }
 
   globalData = {
+    userAuthorized: true,
     userInfo: null,
     appid: 'wx14df6b0c1246e370',
     secret: '11aa8f1c50c6c0289354f2332e8efa0e'
@@ -167,6 +168,17 @@ export default class extends wepy.app {
           // console.log(b, '登陆成功')
         }
       }
+    }
+  }
+
+  async getAuthorizedSetting(cb) {
+    // 查看是否授权
+    const setting = await wepy.getSetting()
+    const isAuthorized = true
+    if (setting.authSetting && setting.authSetting['scope.userInfo']) {
+      cb(isAuthorized)
+    } else {
+      cb(!isAuthorized)
     }
   }
 

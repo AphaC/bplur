@@ -1,0 +1,30 @@
+<style lang="less">
+</style>
+<template>
+  <view class="authorizationButton">
+    <button
+      open-type="getUserInfo"
+      lang="zh_CN"
+      bindgetuserinfo="onGotUserInfo"
+    >
+      {{label}}
+    </button>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class AuthorizationButton extends wepy.component {
+    props = {
+      label: {
+        default: '获取用户信息',
+        type: String
+      },
+    }
+    methods = {
+      onGotUserInfo (e) {
+        this.$emit('onUserAuthorized', e)
+      }
+    }
+  }
+</script>
